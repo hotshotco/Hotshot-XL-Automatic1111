@@ -9,7 +9,7 @@
 </h1>
 
 <p align="center">
-  <img src="https://dvfx9cgvtgnyd.cloudfront.net/hotshot/image-gen/gif_e8a50e1e-0b2e-4ebc-8229-817703585405.gif" alt="a barbie doll smiling in kitchen, oven on fire, disaster, pink wes anderson vibes, cinematic" width="195px" height="111.42px"/>
+  <img src="https://dvfx9cgvtgnyd.cloudfront.net/hotshot/image-gen/gif_6e8fe8f1-c91c-458b-be1e-3afe924b4c9a.gif" alt="a developer making an automatic1111 plugin" width="195px" height="111.42px"/>
   &nbsp;
   <img src="https://dvfx9cgvtgnyd.cloudfront.net/hotshot/image-gen/gif_f6ca56a3-30b8-4b2a-9342-111353e85b96.gif" alt="a teddy bear writing a letter" width="195px" height="111.42px"/>
   &nbsp;
@@ -23,3 +23,4 @@
 <p align="center">This is a WIP extension for <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui">Automatic1111/stable-diffusion-webui</a></p>
 
 <p align="center">If you want to contribute, come join us on our <a href="https://discord.gg/85pqA3GG">Discord!</a> </p>
+
