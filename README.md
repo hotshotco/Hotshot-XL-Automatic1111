@@ -1,5 +1,5 @@
 <h1 align="center"><img src="https://i.imgur.com/HsWXQTW.png" width="24px" alt="logo" /> Hotshot-XL-Automatic1111</h1>
-<p align="center">Official <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui">Automatic1111/stable-diffusion-webui</a> extension</p>
+<p align="center">Official <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui">Automatic1111/stable-diffusion-webui</a> extension (Coming soon)</p>
 <h1 align="center">
   <a href="https://www.hotshot.co">🌐 Try it</a>
   &nbsp;
@@ -18,3 +18,8 @@
   <img src="https://dvfx9cgvtgnyd.cloudfront.net/hotshot/image-gen/gif_2dd3c30f-42c5-4f37-8fa6-b2494fcac4b4.gif" alt="a cat laughing" width="195px" height="111.42px"/>
   &nbsp;
 </p>
+
+
+<p align="center">This is a WIP extension for <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui">Automatic1111/stable-diffusion-webui</a></p>
+
+<p align="center">If you want to contribute, come join us on our <a href="https://discord.gg/85pqA3GG">Discord!</a> </p>
