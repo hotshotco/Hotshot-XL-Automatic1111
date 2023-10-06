@@ -43,8 +43,10 @@ class HotshotXLScript(scripts.Script):
         if isinstance(params, dict): params = HotshotXLParams(**params)
         if params.enable:
             # todo - load the temporal layers model here!
+            from ..hotshot_xl.models.temporal_layers import HotshotXLTemporalLayers
+
             temporal_layers = ...
-            model_controller.hijack_sdxl_model(shared.sd_model, temporal_layers)
+            model_controller.hijack_sdxl_model(shared.sd_model, HotshotXLTemporalLayers())
 
             # todo - alter the batch size so as we are going to pass our latents
             #  through the unet like (b f) c h w
