@@ -84,13 +84,6 @@ class HotshotXLModelController:
 
         GroupNorm32.forward = groupnorm32_mm_forward
 
-        # modules
-        # - TimestepEmbedSequential
-        # -- Res block
-        # -- Spatial Transformer
-        # -- (Optional Upscaler)
-
-        # todo - need to insert hooks for each resnet conv2d call
 
     def restore(self, sd_model):
         unet = sd_model.model.diffusion_model

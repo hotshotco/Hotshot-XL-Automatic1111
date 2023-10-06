@@ -49,11 +49,6 @@ class HotshotXLScript(scripts.Script):
             temporal_layers = ...
             model_controller.hijack_sdxl_model(shared.sd_model, HotshotXLTemporalLayers().to(device=shared.sd_model.device))
 
-            # todo - alter the batch size so as we are going to pass our latents
-            #  through the unet like (b f) c h w
-            #  we will rearrange the tensors as they reach temporal layers
-
-
     def before_process_batch(
             self, p: StableDiffusionProcessing, params: Union[Dict, HotshotXLParams], **kwargs
     ):
