@@ -1,4 +1,6 @@
+import torch
 import torch.nn as nn
+from typing import Optional
 from .transformer_temporal import TransformerTemporal
 
 class Block(nn.Module):
@@ -34,6 +36,10 @@ class HotshotXLTemporalLayers(nn.Module):
                 cross_attention_dim=None,
             ))
             self.up_blocks.append(Block(blks))
+
+    def invoke_block(self, block_direction: int, block_index: int, hidden_states: torch.Tensor, encoder_hidden_states: Optional[torch.Tensor]=None):
+        blocks = self.down_blocks if block_direction == -1 else self.up_blocks
+        return blocks[block_index](hidden_states, encoder_hidden_states)
 
 if __name__ == "__main__":
     layers = HotshotXLTemporalLayers()
