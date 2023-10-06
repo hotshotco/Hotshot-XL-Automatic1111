@@ -44,7 +44,7 @@ class HotshotXLScript(scripts.Script):
         if params.enable:
             # todo - load the temporal layers model here!
             temporal_layers = ...
-            model_controller.hijack(shared.sd_model, temporal_layers)
+            model_controller.hijack_sdxl_model(shared.sd_model, temporal_layers)
 
 
     def before_process_batch(
