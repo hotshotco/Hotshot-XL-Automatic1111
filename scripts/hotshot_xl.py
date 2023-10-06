@@ -2,11 +2,13 @@ import install
 
 import os
 import gradio as gr
+import modules.shared as shared
 from modules import script_callbacks, scripts, shared
 from modules.processing import (Processed, StableDiffusionProcessing,
                                 StableDiffusionProcessingImg2Img)
 from typing import Any, Union, Dict
 from scripts.hotshot_xl_ui import HotshotXLUiGroup, HotshotXLParams
+from scripts.hotshot_xl_model_controller import model_controller
 script_ref = None
 
 script_dir = scripts.basedir()
@@ -34,15 +36,16 @@ class HotshotXLScript(scripts.Script):
     def before_process(
             self, p: StableDiffusionProcessing, params: Union[Dict, HotshotXLParams]
     ):
-        import modules.shared as shared
         if shared.sd_model and not shared.sd_model.is_sdxl:
             print("disabling because sdxl is not loaded...")
             return
 
         if isinstance(params, dict): params = HotshotXLParams(**params)
         if params.enable:
-            # todo - setup the temporal layers IF ENABLED
-            ...
+            # todo - load the temporal layers model here!
+            temporal_layers = ...
+            model_controller.hijack(shared.sd_model, temporal_layers)
+
 
     def before_process_batch(
             self, p: StableDiffusionProcessing, params: Union[Dict, HotshotXLParams], **kwargs
@@ -60,8 +63,10 @@ class HotshotXLScript(scripts.Script):
         ...
 
         if params.enable:
-            ...
-            # todo - restore the pipeline
+
+            # todo - create output, gif / mp4 etc...
+
+            model_controller.restore()
 
 
 def on_ui_settings():
