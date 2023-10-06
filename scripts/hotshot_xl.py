@@ -7,16 +7,19 @@ from modules.processing import (Processed, StableDiffusionProcessing,
                                 StableDiffusionProcessingImg2Img)
 from typing import Any, Union, Dict
 from scripts.hotshot_xl_ui import HotshotXLUiGroup, HotshotXLParams
-
+script_ref = None
 
 script_dir = scripts.basedir()
 
 class HotshotXLScript(scripts.Script):
 
     def __init__(self):
+        print("HotshotXLScript init")
         self.lora_hacker = None
         self.cfg_hacker = None
         self.cn_hacker = None
+        global script_ref
+        script_ref = self
 
     def title(self):
         return "Hotshot-XL"
@@ -31,6 +34,10 @@ class HotshotXLScript(scripts.Script):
     def before_process(
             self, p: StableDiffusionProcessing, params: Union[Dict, HotshotXLParams]
     ):
+        import modules.shared as shared
+        if shared.sd_model and not shared.sd_model.is_sdxl:
+            print("disabling because sdxl is not loaded...")
+            return
 
         if isinstance(params, dict): params = HotshotXLParams(**params)
         if params.enable:
@@ -61,6 +68,10 @@ def on_ui_settings():
     section = ("hotshotxl", "Hotshot-XL")
     pass
 
+def on_model_load(model):
+    print("model loaded. ")
+
 script_callbacks.on_ui_settings(on_ui_settings)
 script_callbacks.on_after_component(HotshotXLUiGroup.on_after_component)
+script_callbacks.on_model_loaded(on_model_load)
 
