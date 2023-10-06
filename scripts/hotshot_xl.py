@@ -9,6 +9,7 @@ from modules.processing import (Processed, StableDiffusionProcessing,
 from typing import Any, Union, Dict
 from scripts.hotshot_xl_ui import HotshotXLUiGroup, HotshotXLParams
 from scripts.hotshot_xl_model_controller import model_controller
+import importlib
 script_ref = None
 
 script_dir = scripts.basedir()
@@ -43,10 +44,10 @@ class HotshotXLScript(scripts.Script):
         if isinstance(params, dict): params = HotshotXLParams(**params)
         if params.enable:
             # todo - load the temporal layers model here!
-            from ..hotshot_xl.models.temporal_layers import HotshotXLTemporalLayers
-
+            from hotshot_xl.models.temporal_layers import HotshotXLTemporalLayers
+            params.set_p(p)
             temporal_layers = ...
-            model_controller.hijack_sdxl_model(shared.sd_model, HotshotXLTemporalLayers())
+            model_controller.hijack_sdxl_model(shared.sd_model, HotshotXLTemporalLayers().to(device=shared.sd_model.device))
 
             # todo - alter the batch size so as we are going to pass our latents
             #  through the unet like (b f) c h w
@@ -72,7 +73,7 @@ class HotshotXLScript(scripts.Script):
 
             # todo - create output, gif / mp4 etc...
 
-            model_controller.restore()
+            model_controller.restore(shared.sd_model)
 
 
 def on_ui_settings():

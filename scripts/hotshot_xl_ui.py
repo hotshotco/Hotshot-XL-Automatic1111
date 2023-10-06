@@ -22,7 +22,7 @@ class HotshotXLParams:
         video_length=8,
         fps=8,
         loop_number=0,
-        format="mp4",
+        format="GIF",
         video_source=None
     ):
         self.model = model
@@ -51,7 +51,7 @@ class HotshotXLParams:
 
     def set_p(self, p):
         self._check()
-        ...
+        p.batch_size = p.batch_size * self.video_length
 
 
 class HotshotXLUiGroup:

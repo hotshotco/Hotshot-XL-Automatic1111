@@ -8,6 +8,7 @@ class Block(nn.Module):
         super().__init__()
         self.temporal_attentions = nn.ModuleList(temporal_attentions)
 
+
 class HotshotXLTemporalLayers(nn.Module):
     def __init__(self):
         super().__init__()
@@ -37,9 +38,9 @@ class HotshotXLTemporalLayers(nn.Module):
             ))
             self.up_blocks.append(Block(blks))
 
-    def invoke_block(self, block_direction: int, block_index: int, hidden_states: torch.Tensor, encoder_hidden_states: Optional[torch.Tensor]=None):
-        blocks = self.down_blocks if block_direction == -1 else self.up_blocks
-        return blocks[block_index](hidden_states, encoder_hidden_states)
+    def get_temporal_layer(self, block_direction: int, block_index: int, attention_index: int):
+        return (self.down_blocks if block_direction == -1 else self.up_blocks)[block_index].temporal_attentions[attention_index]
+
 
 if __name__ == "__main__":
     layers = HotshotXLTemporalLayers()

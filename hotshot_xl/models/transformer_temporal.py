@@ -110,6 +110,7 @@ class TransformerTemporal(nn.Module):
         self.proj_out = nn.Linear(inner_dim, in_channels)
 
     def forward(self, hidden_states, encoder_hidden_states=None):
+
         _, num_channels, f, height, width = hidden_states.shape
         hidden_states = rearrange(hidden_states, "b c f h w -> (b f) c h w")
 
