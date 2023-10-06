@@ -9,7 +9,6 @@ from modules.processing import (Processed, StableDiffusionProcessing,
 from typing import Any, Union, Dict
 from scripts.hotshot_xl_ui import HotshotXLUiGroup, HotshotXLParams
 from scripts.hotshot_xl_model_controller import model_controller
-import importlib
 script_ref = None
 
 script_dir = scripts.basedir()
@@ -43,11 +42,26 @@ class HotshotXLScript(scripts.Script):
 
         if isinstance(params, dict): params = HotshotXLParams(**params)
         if params.enable:
-            # todo - load the temporal layers model here!
-            from hotshot_xl.models.temporal_layers import HotshotXLTemporalLayers
-            params.set_p(p)
-            temporal_layers = ...
-            model_controller.hijack_sdxl_model(shared.sd_model, HotshotXLTemporalLayers().to(device=shared.sd_model.device))
+            from ..hotshot_xl.models.temporal_layers import HotshotXLTemporalLayers
+            from safetensors import safe_open
+
+            model_dir = shared.opts.data.get("hotshot_xl_model_path", os.path.join(script_dir, "model"))
+            model_path = os.path.join(model_dir, params.model)
+
+            temporal_layers = HotshotXLTemporalLayers()
+            torch_model = {}
+            with safe_open(model_path, framework="pt", device="cuda") as f:
+                for key in f.keys():
+                    torch_model[key] = f.get_tensor(key)
+
+            temporal_layers.load_state_dict(torch_model)
+            
+            model_controller.hijack_sdxl_model(shared.sd_model, temporal_layers)
+
+            # todo - alter the batch size so as we are going to pass our latents
+            #  through the unet like (b f) c h w
+            #  we will rearrange the tensors as they reach temporal layers
+
 
     def before_process_batch(
             self, p: StableDiffusionProcessing, params: Union[Dict, HotshotXLParams], **kwargs
