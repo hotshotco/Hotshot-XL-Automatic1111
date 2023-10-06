@@ -12,10 +12,6 @@ from typing import Union
 import numpy as np
 import torch
 
-# don't remove these imports - they are needed to load from pretrain.
-from diffusers.models.modeling_utils import ModelMixin
-from .models.unet import UNet3DConditionModel
-
 from diffusers.utils import (
     BaseOutput,
 )
