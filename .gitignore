@@ -1,0 +1,5 @@
+model/*.safetensors
+model/*.ckpt
+model/*.bin
+.idea
+__pycache__
