@@ -83,12 +83,25 @@ class HotshotXLUiGroup:
         self.params = HotshotXLParams()
 
     def render(self, is_img2img: bool, model_dir: str):
+
+        if is_img2img:
+            return gr.State()
+
         if not os.path.isdir(model_dir):
             os.mkdir(model_dir)
         elemid_prefix = "img2img-hsxl-" if is_img2img else "txt2img-hsxl-"
         model_list = [f for f in os.listdir(model_dir) if f != ".gitkeep"]
 
         with gr.Accordion("Hotshot-XL", open=False):
+
+            if len(model_list) == 0:
+                with gr.Row():
+                    gr.Markdown("No models found!")
+                with gr.Row():
+                    gr.Markdown(f"Please Install models to '{model_dir}' and reload your UI")
+                with gr.Row():
+                    gr.Markdown(f"""Download the weights from <a href='https://huggingface.co/hotshotco/Hotshot-XL/blob/main/hsxl_temporal_layers.f16.safetensors'>here</a>""")
+                    return gr.State()
 
             with gr.Row():
 
