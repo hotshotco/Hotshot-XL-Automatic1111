@@ -104,6 +104,10 @@ class HotshotXLUiGroup:
                     return gr.State()
 
             with gr.Row():
+                gr.Markdown("""This model was trained at aspects close to 512x512 so we recommend using the <a href='https://huggingface.co/hotshotco/SDXL-512/blob/main/hsxl_base_1.0.f16.safetensors'>hotshotco/SDXL-512</a> model which was fine tuned off SDXL.
+                For more info about this project you can read more at the <a href='https://github.com/hotshotco/Hotshot-XL'>Github repository.</a>""")
+
+            with gr.Row():
 
                 self.params.enable = gr.Checkbox(
                     value=self.params.enable, label="Enabled",
