@@ -34,7 +34,7 @@ class HotshotXLOutput:
             video_path_prefix = f"{p.outpath_samples}/{self.working_dir}/{filename}."
 
             video_list = self._add_reverse(params, video_list)
-            video_list = self._interp(p, params, video_list, filename)
+            #video_list = self._interp(p, params, video_list, filename)
             video_paths += self._save(params, video_list, video_path_prefix, res, i)
 
         if len(video_paths) > 0:

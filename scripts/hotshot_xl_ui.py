@@ -27,8 +27,8 @@ class HotshotXLParams:
             stride=1,
             overlap=-1,
             format=["GIF"],
-            interp='Off',
-            interp_x=10,
+            #interp='Off',
+            #interp_x=10,
             reverse=[],
     ):
         self.model = model
@@ -40,8 +40,8 @@ class HotshotXLParams:
         self.stride = stride
         self.overlap = overlap
         self.format = format
-        self.interp = interp
-        self.interp_x = interp_x
+        #self.interp = interp
+        #self.interp_x = interp_x
         self.reverse = reverse
 
     def get_list(self, is_img2img: bool):
@@ -208,19 +208,19 @@ class HotshotXLUiGroup:
                     elem_id=f"{elemid_prefix}reverse",
                     value=self.params.reverse
                 )
-            with gr.Row():
-                self.params.interp = gr.Radio(
-                    choices=["Off", "FILM"],
-                    label="Frame Interpolation Mode",
-                    tooltip="Interpolate between frames with Deforum's FILM implementation. Requires Deforum extension.",
-                    elem_id=f"{elemid_prefix}interp-choice",
-                    value=self.params.interp
-                )
-                self.params.interp_x = gr.Number(
-                    value=self.params.interp_x, label="Interp X", precision=0,
-                    tooltip="Replace each input frame with X interpolated output frames.",
-                    elem_id=f"{elemid_prefix}interp-x"
-                )
+            # with gr.Row():
+            #     self.params.interp = gr.Radio(
+            #         choices=["Off", "FILM"],
+            #         label="Frame Interpolation Mode",
+            #         tooltip="Interpolate between frames with Deforum's FILM implementation. Requires Deforum extension.",
+            #         elem_id=f"{elemid_prefix}interp-choice",
+            #         value=self.params.interp
+            #     )
+            #     self.params.interp_x = gr.Number(
+            #         value=self.params.interp_x, label="Interp X", precision=0,
+            #         tooltip="Replace each input frame with X interpolated output frames.",
+            #         elem_id=f"{elemid_prefix}interp-x"
+            #     )
             # self.params.video_source = gr.Video(
             #     value=self.params.video_source,
             #     label="Video source",
