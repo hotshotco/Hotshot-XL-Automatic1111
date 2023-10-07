@@ -17,7 +17,7 @@ class HotshotXLParams:
 
     def __init__(
         self,
-        model="temporal_layers.safetensors",
+        model="hsxl_temporal_layers.f16.safetensors",
         enable=False,
         video_length=8,
         fps=8,

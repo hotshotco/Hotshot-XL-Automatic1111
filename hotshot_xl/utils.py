@@ -20,6 +20,7 @@ import requests
 import os
 import numpy as np
 import imageio
+import hashlib
 
 
 def get_image(img_path) -> PIL.Image.Image:
@@ -226,3 +227,7 @@ def best_aspect_ratio(aspect_ratio: float, resolution: int):
 
     ar = res[0] / res[1]
     return f"{ar:.2f}", res
+
+def hash_str(input: str):
+    hash_object = hashlib.sha1(input.encode("utf-8"))
+    return hash_object.hexdigest()

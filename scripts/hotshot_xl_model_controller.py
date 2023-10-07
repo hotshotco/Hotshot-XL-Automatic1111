@@ -1,12 +1,22 @@
-import torch
-from hotshot_xl.models.temporal_layers import HotshotXLTemporalLayers
-from sgm.modules.attention import SpatialTransformer
-from sgm.modules.diffusionmodules.openaimodel import ResBlock, TimestepEmbedSequential
+from dataclasses import dataclass
+from typing import Optional
+
 import torch.nn as nn
 from einops import rearrange
+from hotshot_xl.models.temporal_layers import HotshotXLTemporalLayers
+from safetensors import safe_open
+from sgm.modules.attention import SpatialTransformer
+from sgm.modules.diffusionmodules.openaimodel import ResBlock, TimestepEmbedSequential
 from sgm.modules.diffusionmodules.util import GroupNorm32
 
-class InflateTime(nn.Module):
+from hotshot_xl.utils import hash_str
+
+@dataclass
+class TemporalModel:
+    model: HotshotXLTemporalLayers
+    model_hash: str
+
+class TimeCentricTensorReshaper(nn.Module):
     def __init__(self, module, video_length):
         super().__init__()
         self.module = module
@@ -17,15 +27,36 @@ class InflateTime(nn.Module):
         hidden_states = self.module(hidden_states, encoder_hidden_states)
         return rearrange(hidden_states, "b c f h w -> (b f) c h w")
 
+
 class HotshotXLModelController:
 
-    def inject(self, spatial_module, temporal_module, type_to_insert_after: type, video_length=8):
+    def __init__(self):
+        self.current_loaded_temporal_layers: Optional[TemporalModel] = None
+
+    def load_and_inject(self, sd_model, temporal_layers_model_path: str):
+
+        if (not self.current_loaded_temporal_layers or
+                self.current_loaded_temporal_layers.model_hash != hash_str(temporal_layers_model_path)):
+            temporal_layers = HotshotXLTemporalLayers()
+            torch_model = {}
+            with safe_open(temporal_layers_model_path, framework="pt", device="cuda") as f:
+                for key in f.keys():
+                    torch_model[key] = f.get_tensor(key)
+            temporal_layers.load_state_dict(torch_model)
+            self.current_loaded_temporal_layers = TemporalModel(
+                model=temporal_layers.to(device=sd_model.device, dtype=sd_model.dtype),
+                model_hash=temporal_layers_model_path
+            )
+
+        self._hijack_sdxl_model(sd_model, self.current_loaded_temporal_layers.model)
+
+    def _inject(self, spatial_module, temporal_module, type_to_insert_after: type, video_length=8):
         for i, module in enumerate(spatial_module):
             if type(module) == type_to_insert_after:
-                spatial_module.insert(i + 1, InflateTime(temporal_module, video_length=video_length))
+                spatial_module.insert(i + 1, TimeCentricTensorReshaper(temporal_module, video_length=video_length))
                 break
 
-    def hijack_sdxl_model(self, sd_model, temporal_layers: HotshotXLTemporalLayers):
+    def _hijack_sdxl_model(self, sd_model, temporal_layers: HotshotXLTemporalLayers):
         unet = sd_model.model.diffusion_model
 
         unet_input_block_index_to_temporal_layer_map = {
@@ -60,7 +91,7 @@ class HotshotXLModelController:
                 temporal_info['attention_index']
             )
 
-            self.inject(unet.input_blocks[unet_block_index], temporal_module, temporal_info['insert_after'])
+            self._inject(unet.input_blocks[unet_block_index], temporal_module, temporal_info['insert_after'])
 
         for unet_block_index, temporal_info in unet_output_block_index_to_temporal_layer_map.items():
             temporal_module = temporal_layers.get_temporal_layer(
@@ -69,7 +100,7 @@ class HotshotXLModelController:
                 temporal_info['attention_index']
             )
 
-            self.inject(unet.output_blocks[unet_block_index], temporal_module, temporal_info['insert_after'])
+            self._inject(unet.output_blocks[unet_block_index], temporal_module, temporal_info['insert_after'])
 
         # hotshot xl group norms with a different tensor arrangement - same as animate diff
 
@@ -92,14 +123,14 @@ class HotshotXLModelController:
         for block in unet.input_blocks:
             if type(block) is TimestepEmbedSequential:
                 for i, module in enumerate(block):
-                    if type(module) is InflateTime:
+                    if type(module) is TimeCentricTensorReshaper:
                         block.pop(i)
                         break
 
         for block in unet.output_blocks:
             if type(block) is TimestepEmbedSequential:
                 for i, module in enumerate(block):
-                    if type(module) is InflateTime:
+                    if type(module) is TimeCentricTensorReshaper:
                         block.pop(i)
                         break
 

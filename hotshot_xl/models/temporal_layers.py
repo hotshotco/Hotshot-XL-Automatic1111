@@ -20,10 +20,10 @@ class HotshotXLTemporalLayers(nn.Module):
             blks = []
             for _ in range(2):
                 blks.append(TransformerTemporal(
-                num_attention_heads=8,
-                attention_head_dim=channel // 8,
-                in_channels=channel,
-                cross_attention_dim=None,
+                    num_attention_heads=8,
+                    attention_head_dim=channel // 8,
+                    in_channels=channel,
+                    cross_attention_dim=None,
             ))
             self.down_blocks.append(Block(blks))
 
@@ -31,10 +31,10 @@ class HotshotXLTemporalLayers(nn.Module):
             blks = []
             for _ in range(3):
                 blks.append(TransformerTemporal(
-                num_attention_heads=8,
-                attention_head_dim=channel // 8,
-                in_channels=channel,
-                cross_attention_dim=None,
+                    num_attention_heads=8,
+                    attention_head_dim=channel // 8,
+                    in_channels=channel,
+                    cross_attention_dim=None,
             ))
             self.up_blocks.append(Block(blks))
 
