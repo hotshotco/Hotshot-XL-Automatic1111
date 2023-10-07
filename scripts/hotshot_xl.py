@@ -23,6 +23,7 @@ class HotshotXLScript(scripts.Script):
         self.cn_hacker = None
         global script_ref
         script_ref = self
+        os.makedirs(self.model_directory, exist_ok=True)
 
     @property
     def model_directory(self):
