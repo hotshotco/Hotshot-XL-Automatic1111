@@ -30,6 +30,10 @@ class HotshotXLParams:
             #interp='Off',
             #interp_x=10,
             reverse=[],
+            original_size_width=1920,
+            original_size_height=1080,
+            target_size_width=512,
+            target_size_height=512,
     ):
         self.model = model
         self.enable = enable
@@ -43,6 +47,10 @@ class HotshotXLParams:
         #self.interp = interp
         #self.interp_x = interp_x
         self.reverse = reverse
+        self.original_size_width = original_size_width
+        self.original_size_height = original_size_height
+        self.target_size_width = target_size_width
+        self.target_size_height = target_size_height
 
     def get_list(self, is_img2img: bool):
         list_var = list(vars(self).values())
@@ -211,6 +219,47 @@ class HotshotXLUiGroup:
                     tooltip="Reverse the resulting animation, remove the first and/or last frame from duplication.",
                     elem_id=f"{elemid_prefix}reverse",
                     value=self.params.reverse
+                )
+            with gr.Row():
+                gr.Markdown("SDXL Conditioning")
+            with gr.Row():
+                self.params.original_size_width = gr.Slider(
+                    minimum=64,
+                    maximum=4096,
+                    value=self.params.original_size_width,
+                    label="Original Width",
+                    step=8,
+                    precision=0,
+                    elem_id=f"{elemid_prefix}og-width",
+                )
+                self.params.target_size_width = gr.Slider(
+                    minimum=64,
+                    maximum=4096,
+                    value=self.params.target_size_width,
+                    label="Target Width",
+                    step=8,
+                    precision=0,
+                    elem_id=f"{elemid_prefix}tgt-width",
+                )
+
+            with gr.Row():
+                self.params.original_size_height = gr.Slider(
+                    minimum=64,
+                    maximum=4096,
+                    value=self.params.original_size_height,
+                    label="Original Height",
+                    step=8,
+                    precision=0,
+                    elem_id=f"{elemid_prefix}og-height",
+                )
+                self.params.target_size_height = gr.Slider(
+                    minimum=64,
+                    maximum=4096,
+                    value=self.params.target_size_height,
+                    label="Target Height",
+                    step=8,
+                    precision=0,
+                    elem_id=f"{elemid_prefix}tgt-height",
                 )
             # with gr.Row():
             #     self.params.interp = gr.Radio(

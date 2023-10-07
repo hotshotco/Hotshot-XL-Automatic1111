@@ -48,7 +48,12 @@ class HotshotXLScript(scripts.Script):
         if params.enable:
             params.set_p(p)
             model_path = os.path.join(self.model_directory, params.model)
-            model_controller.load_and_inject(shared.sd_model, model_path)
+            model_controller.load_and_inject(
+                shared.sd_model,
+                model_path,
+                (params.original_size_width, params.original_size_height),
+                (params.target_size_width, params.target_size_width)
+            )
             model_controller.set_video_length(params.video_length)
 
     def before_process_batch(
