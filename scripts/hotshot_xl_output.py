@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 from modules import images, shared
 from modules.processing import Processed, StableDiffusionProcessing
-
+from io import BytesIO
 import logging
 logger = logger = logging.getLogger()
 from scripts.hotshot_xl_ui import HotshotXLParams
@@ -181,6 +181,7 @@ class HotshotXLOutput:
             video_path_mp4 = video_path_prefix + "mp4"
             video_paths.append(video_path_mp4)
             imageio.imwrite(video_path_mp4, video_array, fps=params.fps, codec="h264")
+
         if "TXT" in params.format and res.images[index].info is not None:
             video_path_txt = video_path_prefix + "txt"
             self._save_txt(params, video_path_txt, res, index)
