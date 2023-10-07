@@ -16,7 +16,7 @@ from sgm.modules.diffusionmodules.util import GroupNorm32
 from modules import sd_models_xl
 from modules import devices, shared, prompt_parser
 from modules.devices import torch_gc
-
+from modules.processing import StableDiffusionProcessingTxt2Img
 
 @dataclass
 class TemporalModel:

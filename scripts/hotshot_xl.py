@@ -47,6 +47,14 @@ class HotshotXLScript(scripts.Script):
         if isinstance(params, dict): params = HotshotXLParams(**params)
         if params.enable:
             params.set_p(p)
+
+            # we don't cache the conditioning because we modify it using
+            # original width and height & target width and height
+            # which aren't part of the cache key
+
+            p.cached_c = [None, None]
+            p.cached_uc = [None, None]
+
             model_path = os.path.join(self.model_directory, params.model)
             model_controller.load_and_inject(
                 shared.sd_model,
@@ -60,21 +68,15 @@ class HotshotXLScript(scripts.Script):
             self, p: StableDiffusionProcessing, params: Union[Dict, HotshotXLParams], **kwargs
     ):
         if isinstance(params, dict): params = HotshotXLParams(**params)
-        ...
         if params.enable and isinstance(p, StableDiffusionProcessingImg2Img):
+            # - not supported
             ...
-            # todo - randomize latents?
 
     def postprocess(
             self, p: StableDiffusionProcessing, res: Processed, params: Union[Dict, HotshotXLParams]
     ):
         if isinstance(params, dict): params = HotshotXLParams(**params)
-        ...
-
         if params.enable:
-
-            # todo - create output, gif / mp4 etc...
-
             model_controller.restore(shared.sd_model)
             HotshotXLOutput().output(p, res, params)
 
