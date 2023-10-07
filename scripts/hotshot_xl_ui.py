@@ -1,6 +1,7 @@
 import os
 import cv2
 import gradio as gr
+from scripts.hotshot_xl_model_controller import model_controller
 
 class ToolButton(gr.Button, gr.components.FormComponent):
     """Small button with single emoji as text, fits inside gradio forms"""
@@ -112,7 +113,7 @@ class HotshotXLUiGroup:
                 self.params.model = gr.Dropdown(
                     choices=model_list,
                     value=(self.params.model if self.params.model in model_list else None),
-                    label="Temporal Layers",
+                    label="Model",
                     type="value",
                     tooltip="Choose which temporal layers will be injected into the generation process.",
                     elem_id=f"{elemid_prefix}temporal-layers",
@@ -127,7 +128,7 @@ class HotshotXLUiGroup:
                 self.params.video_length = gr.Number(
                     minimum=0,
                     value=self.params.video_length,
-                    label="Number of frames",
+                    label="Total Frames",
                     precision=0,
                     tooltip="Total length of video in frames.",
                     elem_id=f"{elemid_prefix}video-length",
@@ -225,10 +226,10 @@ class HotshotXLUiGroup:
 
             with gr.Row():
                 unload = gr.Button(
-                    value="Move Temporal Layers to CPU (default if lowvram)"
+                    value="Unload Model"
                 )
-                remove = gr.Button(value="Remove Temporal Layers from any memory")
-                #unload.click(fn=motion_module.unload)
+                #remove = gr.Button(value="Clean Memory")
+                unload.click(fn=model_controller.unload)
                 #remove.click(fn=motion_module.remove)
         return self.register_unit(is_img2img)
 

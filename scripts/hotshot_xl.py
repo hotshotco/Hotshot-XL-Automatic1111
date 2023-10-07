@@ -2,7 +2,6 @@ import install
 
 import os
 import gradio as gr
-import modules.shared as shared
 from modules import script_callbacks, scripts, shared
 from modules.processing import (Processed, StableDiffusionProcessing,
                                 StableDiffusionProcessingImg2Img)

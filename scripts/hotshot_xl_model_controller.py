@@ -1,15 +1,18 @@
+import gc
 from dataclasses import dataclass
 from typing import Optional
 
 import torch.nn as nn
 from einops import rearrange
 from hotshot_xl.models.temporal_layers import HotshotXLTemporalLayers
+from hotshot_xl.utils import hash_str
 from safetensors import safe_open
 from sgm.modules.attention import SpatialTransformer
 from sgm.modules.diffusionmodules.openaimodel import ResBlock, TimestepEmbedSequential
 from sgm.modules.diffusionmodules.util import GroupNorm32
+from modules import shared
+from modules.devices import torch_gc
 
-from hotshot_xl.utils import hash_str
 
 @dataclass
 class TemporalModel:
@@ -74,6 +77,7 @@ class HotshotXLModelController:
 
     def _hijack_sdxl_model(self, sd_model, temporal_layers: HotshotXLTemporalLayers):
         unet = sd_model.model.diffusion_model
+        setattr(unet, "hsxl_hijacked", True)
 
         unet_input_block_index_to_temporal_layer_map = {
             1: {"block_index": 0, "attention_index": 0, "insert_after": ResBlock},
@@ -131,6 +135,17 @@ class HotshotXLModelController:
 
         GroupNorm32.forward = groupnorm32_mm_forward
 
+    def unload(self):
+
+        if (shared.sd_model.model.diffusion_model
+                and hasattr(shared.sd_model.model.diffusion_model, "hsxl_hijacked")
+                and shared.sd_model.model.diffusion_model.hsxl_hijacked is True):
+
+            self.restore(shared.sd_model)
+
+        self.current_loaded_temporal_layers = None
+        torch_gc()
+        gc.collect()
 
     def restore(self, sd_model):
         unet = sd_model.model.diffusion_model
@@ -152,5 +167,6 @@ class HotshotXLModelController:
                         block.pop(i)
                         break
 
+        setattr(unet, "hsxl_hijacked", False)
 
 model_controller = HotshotXLModelController()
