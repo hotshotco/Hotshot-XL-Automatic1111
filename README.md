@@ -20,7 +20,7 @@
 </p>
 
 
-<p align="center">This is a WIP extension for <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui">Automatic1111/stable-diffusion-webui</a></p>
+<p align="center">This is an extension for <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui">Automatic1111/stable-diffusion-webui</a></p>
 
 <p align="center">If you want to contribute, come join us on our <a href="https://discord.gg/85pqA3GG">Discord!</a> </p>
 
