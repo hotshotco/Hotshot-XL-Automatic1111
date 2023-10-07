@@ -4,7 +4,7 @@ import logging
 import subprocess
 
 # Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - Hotshot-XL Ext: %(message)s')
+#logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - Hotshot-XL Ext: %(message)s')
 logger = logging.getLogger()
 
 min_diffusers_version = "0.21.4"

@@ -9,7 +9,7 @@ from modules.processing import (Processed, StableDiffusionProcessing,
 from typing import Any, Union, Dict
 from scripts.hotshot_xl_ui import HotshotXLUiGroup, HotshotXLParams
 from scripts.hotshot_xl_model_controller import model_controller
-
+from scripts.hotshot_xl_output import HotshotXLOutput
 
 script_ref = None
 
@@ -50,6 +50,7 @@ class HotshotXLScript(scripts.Script):
             params.set_p(p)
             model_path = os.path.join(self.model_directory, params.model)
             model_controller.load_and_inject(shared.sd_model, model_path)
+            model_controller.set_video_length(params.video_length)
 
     def before_process_batch(
             self, p: StableDiffusionProcessing, params: Union[Dict, HotshotXLParams], **kwargs
@@ -71,6 +72,7 @@ class HotshotXLScript(scripts.Script):
             # todo - create output, gif / mp4 etc...
 
             model_controller.restore(shared.sd_model)
+            HotshotXLOutput().output(p, res, params)
 
 
 def on_ui_settings():

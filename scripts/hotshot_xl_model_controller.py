@@ -17,12 +17,17 @@ class TemporalModel:
     model_hash: str
 
 class TimeCentricTensorReshaper(nn.Module):
-    def __init__(self, module, video_length):
+    def __init__(self, module):
         super().__init__()
         self.module = module
-        self.video_length = video_length
+        self.video_length = 8
 
     def forward(self, hidden_states, encoder_hidden_states=None):
+
+        if self.video_length < 1:
+            # skip this module
+            return hidden_states
+
         hidden_states = rearrange(hidden_states, "(b f) c h w -> b c f h w", f=self.video_length)
         hidden_states = self.module(hidden_states, encoder_hidden_states)
         return rearrange(hidden_states, "b c f h w -> (b f) c h w")
@@ -32,6 +37,14 @@ class HotshotXLModelController:
 
     def __init__(self):
         self.current_loaded_temporal_layers: Optional[TemporalModel] = None
+        self.time_centric_tensor_reshaper_cache = []
+
+    def set_video_length(self, video_length: int = 1):
+        if video_length < 1:
+            print("Warning - video length is < 1 - temporal layers will be deactivated.")
+
+        for module in self.time_centric_tensor_reshaper_cache:
+            module.video_length = video_length
 
     def load_and_inject(self, sd_model, temporal_layers_model_path: str):
 
@@ -50,10 +63,13 @@ class HotshotXLModelController:
 
         self._hijack_sdxl_model(sd_model, self.current_loaded_temporal_layers.model)
 
-    def _inject(self, spatial_module, temporal_module, type_to_insert_after: type, video_length=8):
+    def _inject(self, spatial_module, temporal_module, type_to_insert_after: type):
         for i, module in enumerate(spatial_module):
             if type(module) == type_to_insert_after:
-                spatial_module.insert(i + 1, TimeCentricTensorReshaper(temporal_module, video_length=video_length))
+                self.time_centric_tensor_reshaper_cache.append(
+                    TimeCentricTensorReshaper(temporal_module)
+                )
+                spatial_module.insert(i + 1, self.time_centric_tensor_reshaper_cache[-1])
                 break
 
     def _hijack_sdxl_model(self, sd_model, temporal_layers: HotshotXLTemporalLayers):
@@ -119,6 +135,8 @@ class HotshotXLModelController:
     def restore(self, sd_model):
         unet = sd_model.model.diffusion_model
         GroupNorm32.forward = self.gn32_original_forward
+
+        self.time_centric_tensor_reshaper_cache = []
 
         for block in unet.input_blocks:
             if type(block) is TimestepEmbedSequential:

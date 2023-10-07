@@ -16,23 +16,36 @@ class ToolButton(gr.Button, gr.components.FormComponent):
 class HotshotXLParams:
 
     def __init__(
-        self,
-        model="hsxl_temporal_layers.f16.safetensors",
-        enable=False,
-        video_length=8,
-        fps=8,
-        loop_number=0,
-        format="GIF",
-        video_source=None
+            self,
+            model="hsxl_temporal_layers.f16.safetensors",
+            enable=False,
+            video_length=0,
+            fps=8,
+            loop_number=0,
+            closed_loop=False,
+            batch_size=16,
+            stride=1,
+            overlap=-1,
+            format=["GIF", "PNG"],
+            interp='Off',
+            interp_x=10,
+            reverse=[],
+            video_source=None,
     ):
         self.model = model
         self.enable = enable
         self.video_length = video_length
         self.fps = fps
         self.loop_number = loop_number
+        self.closed_loop = closed_loop
+        self.batch_size = batch_size
+        self.stride = stride
+        self.overlap = overlap
         self.format = format
+        self.interp = interp
+        self.interp_x = interp_x
+        self.reverse = reverse
         self.video_source = video_source
-
 
     def get_list(self, is_img2img: bool):
         list_var = list(vars(self).values())
@@ -48,10 +61,26 @@ class HotshotXLParams:
             self.format
         ), "At least one saving format should be selected."
 
+    #
+    # def set_p(self, p):
+    #     self._check()
+    #     p.batch_size = p.batch_size * self.video_length
 
     def set_p(self, p):
         self._check()
-        p.batch_size = p.batch_size * self.video_length
+        if self.video_length < self.batch_size:
+            p.batch_size = self.batch_size
+        else:
+            p.batch_size = self.video_length
+        if self.video_length == 0:
+            self.video_length = p.batch_size
+            self.video_default = True
+        else:
+            self.video_default = False
+        if self.overlap == -1:
+            self.overlap = self.batch_size // 4
+        if "PNG" not in self.format:
+            p.do_not_save_samples = True
 
 
 class HotshotXLUiGroup:
@@ -120,7 +149,38 @@ class HotshotXLUiGroup:
                     tooltip="How many times the animation will loop, a value of 0 will loop forever.",
                     elem_id=f"{elemid_prefix}loop-number",
                 )
-
+            with gr.Row():
+                self.params.closed_loop = gr.Checkbox(
+                    value=self.params.closed_loop,
+                    label="Closed loop",
+                    tooltip="If enabled, will try to make the last frame the same as the first frame.",
+                    elem_id=f"{elemid_prefix}closed-loop",
+                )
+                self.params.batch_size = gr.Slider(
+                    minimum=1,
+                    maximum=32,
+                    value=self.params.batch_size,
+                    label="Context batch size",
+                    step=1,
+                    precision=0,
+                    elem_id=f"{elemid_prefix}batch-size",
+                )
+                self.params.stride = gr.Number(
+                    minimum=1,
+                    value=self.params.stride,
+                    label="Stride",
+                    precision=0,
+                    tooltip="",
+                    elem_id=f"{elemid_prefix}stride",
+                )
+                self.params.overlap = gr.Number(
+                    minimum=-1,
+                    value=self.params.overlap,
+                    label="Overlap",
+                    precision=0,
+                    tooltip="Number of frames to overlap in context.",
+                    elem_id=f"{elemid_prefix}overlap",
+                )
             with gr.Row():
                 self.params.format = gr.CheckboxGroup(
                     choices=["GIF", "MP4", "PNG", "TXT"],
@@ -130,7 +190,27 @@ class HotshotXLUiGroup:
                     elem_id=f"{elemid_prefix}save-format",
                     value=self.params.format,
                 )
-
+                self.params.reverse = gr.CheckboxGroup(
+                    choices=["Add Reverse Frame", "Remove head", "Remove tail"],
+                    label="Reverse",
+                    type="index",
+                    tooltip="Reverse the resulting animation, remove the first and/or last frame from duplication.",
+                    elem_id=f"{elemid_prefix}reverse",
+                    value=self.params.reverse
+                )
+            with gr.Row():
+                self.params.interp = gr.Radio(
+                    choices=["Off", "FILM"],
+                    label="Frame Interpolation",
+                    tooltip="Interpolate between frames with Deforum's FILM implementation. Requires Deforum extension.",
+                    elem_id=f"{elemid_prefix}interp-choice",
+                    value=self.params.interp
+                )
+                self.params.interp_x = gr.Number(
+                    value=self.params.interp_x, label="Interp X", precision=0,
+                    tooltip="Replace each input frame with X interpolated output frames.",
+                    elem_id=f"{elemid_prefix}interp-x"
+                )
             self.params.video_source = gr.Video(
                 value=self.params.video_source,
                 label="Video source",
