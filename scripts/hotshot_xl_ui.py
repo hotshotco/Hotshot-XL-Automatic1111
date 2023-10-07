@@ -13,7 +13,6 @@ class ToolButton(gr.Button, gr.components.FormComponent):
     def get_block_name(self):
         return "button"
 
-
 class HotshotXLParams:
 
     def __init__(
@@ -34,6 +33,11 @@ class HotshotXLParams:
             original_size_height=1080,
             target_size_width=512,
             target_size_height=512,
+
+            negative_original_size_width=512,
+            negative_original_size_height=512,
+            negative_target_size_width=64,
+            negative_target_size_height=64,
     ):
         self.model = model
         self.enable = enable
@@ -47,10 +51,16 @@ class HotshotXLParams:
         #self.interp = interp
         #self.interp_x = interp_x
         self.reverse = reverse
+
         self.original_size_width = original_size_width
         self.original_size_height = original_size_height
         self.target_size_width = target_size_width
         self.target_size_height = target_size_height
+
+        self.negative_original_size_width = negative_original_size_width
+        self.negative_original_size_height = negative_original_size_height
+        self.negative_target_size_width = negative_target_size_width
+        self.negative_target_size_height = negative_target_size_height
 
     def get_list(self, is_img2img: bool):
         list_var = list(vars(self).values())
@@ -100,6 +110,12 @@ class HotshotXLUiGroup:
         elemid_prefix = "img2img-hsxl-" if is_img2img else "txt2img-hsxl-"
         model_list = [f for f in os.listdir(model_dir) if f != ".gitkeep"]
 
+        def padding():
+            with gr.Row():
+                gr.Markdown('<div style="width:100%; margin-bottom:1em;"></div>')
+
+
+        divider = '<hr style="margin: 1em 0 1em 0"/>'
         with gr.Accordion("Hotshot-XL", open=False):
 
             if len(model_list) == 0:
@@ -114,6 +130,8 @@ class HotshotXLUiGroup:
             with gr.Row():
                 gr.Markdown("""This model was trained at aspects close to 512x512 so we recommend using the <a href='https://huggingface.co/hotshotco/SDXL-512/blob/main/hsxl_base_1.0.f16.safetensors'>hotshotco/SDXL-512</a> model which was fine tuned off SDXL.
                 For more info about this project you can read more at the <a href='https://github.com/hotshotco/Hotshot-XL'>Github repository.</a>""")
+
+            padding()
 
             with gr.Row():
 
@@ -148,6 +166,9 @@ class HotshotXLUiGroup:
                 refresh_model.click(
                     refresh_models, self.params.model, self.params.model
                 )
+
+            padding()
+
             with gr.Row():
 
                 self.params.video_length = gr.Number(
@@ -171,6 +192,9 @@ class HotshotXLUiGroup:
                     tooltip="How many times the animation will loop, a value of 0 will loop forever.",
                     elem_id=f"{elemid_prefix}loop-number",
                 )
+
+            padding()
+
             with gr.Row():
                 # self.params.closed_loop = gr.Checkbox(
                 #     value=self.params.closed_loop,
@@ -178,6 +202,7 @@ class HotshotXLUiGroup:
                 #     tooltip="If enabled, will try to make the last frame the same as the first frame.",
                 #     elem_id=f"{elemid_prefix}closed-loop",
                 # )
+
                 self.params.batch_size = gr.Slider(
                     minimum=1,
                     maximum=32,
@@ -203,6 +228,9 @@ class HotshotXLUiGroup:
                     tooltip="Number of frames to overlap in context.",
                     elem_id=f"{elemid_prefix}overlap",
                 )
+
+            padding()
+
             with gr.Row():
                 self.params.format = gr.CheckboxGroup(
                     choices=["GIF", "PNG"],
@@ -220,47 +248,100 @@ class HotshotXLUiGroup:
                     elem_id=f"{elemid_prefix}reverse",
                     value=self.params.reverse
                 )
-            with gr.Row():
-                gr.Markdown("SDXL Conditioning")
-            with gr.Row():
-                self.params.original_size_width = gr.Slider(
-                    minimum=64,
-                    maximum=4096,
-                    value=self.params.original_size_width,
-                    label="Original Width",
-                    step=8,
-                    precision=0,
-                    elem_id=f"{elemid_prefix}og-width",
-                )
-                self.params.target_size_width = gr.Slider(
-                    minimum=64,
-                    maximum=4096,
-                    value=self.params.target_size_width,
-                    label="Target Width",
-                    step=8,
-                    precision=0,
-                    elem_id=f"{elemid_prefix}tgt-width",
-                )
+
+            padding()
 
             with gr.Row():
-                self.params.original_size_height = gr.Slider(
-                    minimum=64,
-                    maximum=4096,
-                    value=self.params.original_size_height,
-                    label="Original Height",
-                    step=8,
-                    precision=0,
-                    elem_id=f"{elemid_prefix}og-height",
-                )
-                self.params.target_size_height = gr.Slider(
-                    minimum=64,
-                    maximum=4096,
-                    value=self.params.target_size_height,
-                    label="Target Height",
-                    step=8,
-                    precision=0,
-                    elem_id=f"{elemid_prefix}tgt-height",
-                )
+                gr.Markdown("SDXL Conditioning")
+
+            with gr.Row():
+                with gr.Accordion("Positive"):
+                    with gr.Row():
+                        self.params.original_size_width = gr.Slider(
+                            minimum=64,
+                            maximum=4096,
+                            value=self.params.original_size_width,
+                            label="Original Width",
+                            step=8,
+                            precision=0,
+                            elem_id=f"{elemid_prefix}og-width",
+                        )
+                        self.params.target_size_width = gr.Slider(
+                            minimum=64,
+                            maximum=4096,
+                            value=self.params.target_size_width,
+                            label="Target Width",
+                            step=8,
+                            precision=0,
+                            elem_id=f"{elemid_prefix}tgt-width",
+                        )
+
+                    padding()
+
+                    with gr.Row():
+                        self.params.original_size_height = gr.Slider(
+                            minimum=64,
+                            maximum=4096,
+                            value=self.params.original_size_height,
+                            label="Original Height",
+                            step=8,
+                            precision=0,
+                            elem_id=f"{elemid_prefix}og-height",
+                        )
+                        self.params.target_size_height = gr.Slider(
+                            minimum=64,
+                            maximum=4096,
+                            value=self.params.target_size_height,
+                            label="Target Height",
+                            step=8,
+                            precision=0,
+                            elem_id=f"{elemid_prefix}tgt-height",
+                        )
+
+            with gr.Row():
+                with gr.Accordion("Negative"):
+                    with gr.Row():
+                        self.params.negative_original_size_width = gr.Slider(
+                            minimum=64,
+                            maximum=4096,
+                            value=self.params.negative_original_size_width,
+                            label="Original Width",
+                            step=8,
+                            precision=0,
+                            elem_id=f"{elemid_prefix}ng-og-width",
+                        )
+                        self.params.negative_target_size_width = gr.Slider(
+                            minimum=64,
+                            maximum=4096,
+                            value=self.params.negative_target_size_width,
+                            label="Target Width",
+                            step=8,
+                            precision=0,
+                            elem_id=f"{elemid_prefix}ng-tgt-width",
+                        )
+
+                    padding()
+
+                    with gr.Row():
+                        self.params.negative_original_size_height = gr.Slider(
+                            minimum=64,
+                            maximum=4096,
+                            value=self.params.negative_original_size_height,
+                            label="Original Height",
+                            step=8,
+                            precision=0,
+                            elem_id=f"{elemid_prefix}ng-og-height",
+                        )
+                        self.params.negative_target_size_height = gr.Slider(
+                            minimum=64,
+                            maximum=4096,
+                            value=self.params.negative_target_size_height,
+                            label="Target Height",
+                            step=8,
+                            precision=0,
+                            elem_id=f"{elemid_prefix}ng-tgt-height",
+                        )
+
             # with gr.Row():
             #     self.params.interp = gr.Radio(
             #         choices=["Off", "FILM"],
@@ -289,7 +370,7 @@ class HotshotXLUiGroup:
                     return int(self.params.fps.value)
 
             #self.params.video_source.change(update_fps, inputs=self.params.video_source, outputs=self.params.fps)
-
+            padding()
             with gr.Row():
                 unload = gr.Button(
                     value="Unload Model"

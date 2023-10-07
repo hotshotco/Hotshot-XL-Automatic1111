@@ -59,8 +59,16 @@ class HotshotXLScript(scripts.Script):
             model_controller.load_and_inject(
                 shared.sd_model,
                 model_path,
-                (params.original_size_width, params.original_size_height),
-                (params.target_size_width, params.target_size_width)
+                cond={
+                    "positive": {
+                        "og_size": (params.original_size_width, params.original_size_height),
+                        "tgt_size": (params.target_size_width, params.target_size_width),
+                    },
+                    "negative": {
+                        "og_size": (params.negative_original_size_width, params.negative_original_size_height),
+                        "tgt_size": (params.negative_target_size_width, params.negative_target_size_width),
+                    }
+                }
             )
             model_controller.set_video_length(params.video_length)
 

@@ -56,8 +56,7 @@ class HotshotXLModelController:
     def load_and_inject(self,
                         sd_model,
                         temporal_layers_model_path: str,
-                        original_image_size: tuple,
-                        target_image_size: tuple,
+                        cond: dict
                         ):
 
         if (not self.current_loaded_temporal_layers or
@@ -74,7 +73,7 @@ class HotshotXLModelController:
             )
 
         self._hijack_sdxl_model(sd_model, self.current_loaded_temporal_layers.model)
-        self._hijack_sd_models_xl_conditioning(original_image_size, target_image_size)
+        self._hijack_sd_models_xl_conditioning(cond)
 
     def _inject(self, spatial_module, temporal_module, type_to_insert_after: type):
         for i, module in enumerate(spatial_module):
@@ -85,7 +84,7 @@ class HotshotXLModelController:
                 spatial_module.insert(i + 1, self.time_centric_tensor_reshaper_cache[-1])
                 break
 
-    def _hijack_sd_models_xl_conditioning(self, original_size: tuple, target_size: tuple):
+    def _hijack_sd_models_xl_conditioning(self, cond: dict):
         self.old_get_learned_conditioning = sd_models_xl.get_learned_conditioning
 
         # auto 1111 is limited in controlling the conditioning for sdxl
@@ -98,16 +97,19 @@ class HotshotXLModelController:
                 embedder.ucg_rate = 0.0
 
             is_negative_prompt = getattr(batch, 'is_negative_prompt', False)
+
+            c = cond['negative'] if is_negative_prompt else cond['positive']
+
             aesthetic_score = shared.opts.sdxl_refiner_low_aesthetic_score if is_negative_prompt else shared.opts.sdxl_refiner_high_aesthetic_score
 
             devices_args = dict(device=devices.device, dtype=devices.dtype)
 
             sdxl_conds = {
                 "txt": batch,
-                "original_size_as_tuple": torch.tensor(list(original_size), **devices_args).repeat(len(batch), 1),
+                "original_size_as_tuple": torch.tensor(list(c['og_size']), **devices_args).repeat(len(batch), 1),
                 "crop_coords_top_left": torch.tensor([shared.opts.sdxl_crop_top, shared.opts.sdxl_crop_left],
                                                      **devices_args).repeat(len(batch), 1),
-                "target_size_as_tuple": torch.tensor(list(target_size), **devices_args).repeat(len(batch), 1),
+                "target_size_as_tuple": torch.tensor(list(c['tgt_size']), **devices_args).repeat(len(batch), 1),
                 "aesthetic_score": torch.tensor([aesthetic_score], **devices_args).repeat(len(batch), 1),
             }
 
