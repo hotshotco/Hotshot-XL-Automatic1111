@@ -2,9 +2,11 @@ print("Hotshot-XL install.py")
 
 import logging
 import subprocess
+import os
+from modules import scripts
 
-# Set up logging
-#logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - Hotshot-XL Ext: %(message)s')
+os.makedirs(os.path.join(scripts.basedir(), "model"), exist_ok=True)
+
 logger = logging.getLogger()
 
 min_diffusers_version = "0.21.4"
