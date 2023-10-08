@@ -6,11 +6,13 @@ from modules import script_callbacks, scripts, shared
 from modules.processing import (Processed, StableDiffusionProcessing,
                                 StableDiffusionProcessingImg2Img)
 from typing import Any, Union, Dict
-from scripts.hotshot_xl_ui import HotshotXLUiGroup, HotshotXLParams
-from scripts.hotshot_xl_model_controller import model_controller
-from scripts.hotshot_xl_output import HotshotXLOutput
 
-script_ref = None
+try:
+    from scripts.hotshot_xl_ui import HotshotXLUiGroup, HotshotXLParams
+    from scripts.hotshot_xl_model_controller import model_controller
+    from scripts.hotshot_xl_output import HotshotXLOutput
+except:
+    ...
 
 script_dir = scripts.basedir()
 
@@ -21,8 +23,6 @@ class HotshotXLScript(scripts.Script):
         self.lora_hacker = None
         self.cfg_hacker = None
         self.cn_hacker = None
-        global script_ref
-        script_ref = self
         os.makedirs(self.model_directory, exist_ok=True)
 
     @property
