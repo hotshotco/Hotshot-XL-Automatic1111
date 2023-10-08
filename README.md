@@ -29,9 +29,11 @@
 Go to the same directory as your stable-diffusion-webui location and open a terminal.
 
 ```
-git clone https://github.com/hotshotco/Hotshot-XL-Automatic1111.git stable-diffusion-webui/extensions/hotshot-xl
+git clone https://github.com/hotshotco/Hotshot-XL-Automatic1111.git stable-diffusion-webui/extensions/.
 ```
-or install from the extensions tab in the webui using this link: https://github.com/hotshotco/Hotshot-XL-Automatic1111.git
+or install from the extensions tab in the webui using this link: https://github.com/hotshotco/Hotshot-XL-Automatic1111.git 
+
+<img width="808" alt="Screenshot 2023-10-08 at 10 13 53" src="https://github.com/hotshotco/Hotshot-XL-Automatic1111/assets/6505872/b096021a-b2f1-4579-aa39-2a97d3cccf5d">
 
 # Get the Models
 
@@ -39,7 +41,7 @@ or install from the extensions tab in the webui using this link: https://github.
 Download the Hotshot SDXL-512 f16 model. (from [here](https://huggingface.co/hotshotco/SDXL-512/blob/main/hsxl_base_1.0.f16.safetensors)) and place it in your `stable-diffusion-webui/models/Stable-diffusion/SDXL` directory.
 
 ## Temporal Layers
-Now download the temporal model (from [here](https://huggingface.co/hotshotco/Hotshot-XL/blob/main/hsxl_temporal_layers.f16.safetensors)) and place it in the `stable-diffusion-webui/extensions/hotshot-xl/model` directory. 
+Now download the temporal model (from [here](https://huggingface.co/hotshotco/Hotshot-XL/blob/main/hsxl_temporal_layers.f16.safetensors)) and place it in the `stable-diffusion-webui/extensions/Hotshot-XL-Automatic1111/model` directory. 
 Note this path might be different if you installed it from the extensions tab.
 
 
