@@ -6,9 +6,13 @@ from modules import script_callbacks, scripts, shared
 from modules.processing import (Processed, StableDiffusionProcessing,
                                 StableDiffusionProcessingImg2Img)
 from typing import Any, Union, Dict
-from scripts.hotshot_xl_ui import HotshotXLUiGroup, HotshotXLParams
-from scripts.hotshot_xl_model_controller import model_controller
-from scripts.hotshot_xl_output import HotshotXLOutput
+
+try:
+    from scripts.hotshot_xl_ui import HotshotXLUiGroup, HotshotXLParams
+    from scripts.hotshot_xl_model_controller import model_controller
+    from scripts.hotshot_xl_output import HotshotXLOutput
+except:
+    ...
 
 script_dir = scripts.basedir()
 

@@ -1,7 +1,11 @@
 import os
 import cv2
 import gradio as gr
-from scripts.hotshot_xl_model_controller import model_controller
+try:
+    from scripts.hotshot_xl_model_controller import model_controller
+except:
+    ...
+import packages
 
 class ToolButton(gr.Button, gr.components.FormComponent):
     """Small button with single emoji as text, fits inside gradio forms"""
@@ -114,18 +118,29 @@ class HotshotXLUiGroup:
             with gr.Row():
                 gr.Markdown('<div style="width:100%; margin-bottom:1em;"></div>')
 
-
-        divider = '<hr style="margin: 1em 0 1em 0"/>'
         with gr.Accordion("Hotshot-XL", open=False):
 
+            further_setup_needed = False
+
+            if not packages.is_diffusers_installed():
+                further_setup_needed = True
+                with gr.Row():
+                    gr.Markdown(f"""This package relies on diffusers=={packages.min_diffusers_version}. Please make sure it is installed!
+                    pip install diffusers=={packages.min_diffusers_version}""")
+
             if len(model_list) == 0:
+                further_setup_needed = True
                 with gr.Row():
                     gr.Markdown("No models found!")
                 with gr.Row():
-                    gr.Markdown(f"Please Install models to '{model_dir}' and reload your UI")
+                    gr.Markdown(f"Please Install models to '{model_dir}'")
                 with gr.Row():
                     gr.Markdown(f"""Download the weights from <a href='https://huggingface.co/hotshotco/Hotshot-XL/blob/main/hsxl_temporal_layers.f16.safetensors'>here</a>""")
-                    return gr.State()
+
+            if further_setup_needed:
+                with gr.Row():
+                    gr.Markdown(f"After completing the above, please reload your UI")
+                return gr.State()
 
             with gr.Row():
                 gr.Markdown("""This model was trained at aspects close to 512x512 so we recommend using the <a href='https://huggingface.co/hotshotco/SDXL-512/blob/main/hsxl_base_1.0.f16.safetensors'>hotshotco/SDXL-512</a> model which was fine tuned off SDXL.
