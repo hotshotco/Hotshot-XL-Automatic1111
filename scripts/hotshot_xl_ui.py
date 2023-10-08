@@ -1,10 +1,7 @@
 import os
 import cv2
 import gradio as gr
-try:
-    from scripts.hotshot_xl_model_controller import model_controller
-except:
-    ...
+
 import packages
 
 class ToolButton(gr.Button, gr.components.FormComponent):
@@ -390,11 +387,12 @@ class HotshotXLUiGroup:
                 unload = gr.Button(
                     value="Unload Model"
                 )
-                #remove = gr.Button(value="Clean Memory")
-                unload.click(fn=model_controller.unload)
-                #remove.click(fn=motion_module.remove)
+                unload.click(fn=self.unload_model)
         return self.register_unit(is_img2img)
 
+    def unload_model(self):
+        from scripts.hotshot_xl_model_controller import model_controller
+        model_controller.unload()
 
     def register_unit(self, is_img2img: bool):
 
