@@ -46,7 +46,7 @@ class HotshotXLScript(scripts.Script):
             return
 
         if isinstance(params, dict): params = HotshotXLParams(**params)
-        if params.enable:
+        if params is not None and params.enable:
             params.set_p(p)
 
             # we don't cache the conditioning because we modify it using
@@ -77,7 +77,7 @@ class HotshotXLScript(scripts.Script):
             self, p: StableDiffusionProcessing, params: Union[Dict, HotshotXLParams], **kwargs
     ):
         if isinstance(params, dict): params = HotshotXLParams(**params)
-        if params.enable and isinstance(p, StableDiffusionProcessingImg2Img):
+        if params is not None and params.enable and isinstance(p, StableDiffusionProcessingImg2Img):
             # - not supported
             ...
 
@@ -85,7 +85,7 @@ class HotshotXLScript(scripts.Script):
             self, p: StableDiffusionProcessing, res: Processed, params: Union[Dict, HotshotXLParams]
     ):
         if isinstance(params, dict): params = HotshotXLParams(**params)
-        if params.enable:
+        if params is not None and params.enable:
             model_controller.restore(shared.sd_model)
             HotshotXLOutput().output(p, res, params)
 
