@@ -14,10 +14,21 @@ except:
 
 script_dir = scripts.basedir()
 
+default_hotshot_xl_model_path = os.path.join(script_dir, 'model')
+if str(default_hotshot_xl_model_path).startswith(os.getcwd()):
+    default_hotshot_xl_model_path = os.path.relpath(default_hotshot_xl_model_path, os.getcwd())
+else:
+    default_hotshot_xl_model_path = os.path.abspath(default_hotshot_xl_model_path)
+
+shared.options_templates.update(shared.options_section(('hotshot_xl', 'Hotshot-XL'), {
+    'hotshot_xl_model_path': shared.OptionInfo(default_hotshot_xl_model_path, 'Hotshot-XL model path', component_args=shared.hide_dirs),
+}))
+
+
 class HotshotXLScript(scripts.Script):
 
     def __init__(self):
-        print("HotshotXLScript init")
+        # print("HotshotXLScript init")
         self.lora_hacker = None
         self.cfg_hacker = None
         self.cn_hacker = None
@@ -25,7 +36,7 @@ class HotshotXLScript(scripts.Script):
 
     @property
     def model_directory(self):
-        return shared.opts.data.get("hotshot_xl_model_path", os.path.join(script_dir, "model"))
+        return shared.opts.data.get("hotshot_xl_model_path", default_hotshot_xl_model_path)
 
     def title(self):
         return "Hotshot-XL"
