@@ -1,5 +1,3 @@
-import install
-
 import os
 import gradio as gr
 from modules import script_callbacks, scripts, shared

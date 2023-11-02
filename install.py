@@ -1,13 +1,15 @@
-print("Hotshot-XL install.py")
+import launch
+import pkg_resources
 
-import logging
-import os
-from modules import scripts
-import packages
+min_diffusers_version = '0.21.4'
 
-os.makedirs(os.path.join(scripts.basedir(), "model"), exist_ok=True)
-
-logger = logging.getLogger()
-
-# if not packages.is_diffusers_installed():
-#     packages.install_diffusers()
+try:
+    if launch.is_installed('diffusers'):
+        diffusers_version = pkg_resources.get_distribution('diffusers').version
+        if diffusers_version < min_diffusers_version:
+            launch.run_pip(f"install -U diffusers==0.21.4", f"Hotshot-XL requirement: changing diffusers version from {diffusers_version} to {min_diffusers_version}")
+    else:
+        launch.run_pip(f"install diffusers==0.21.4", 'Hotshot-XL requirement: diffusers')
+except Exception as e:
+    print(e)
+    print(f'Warning: Failed to install diffusers, Hotshot-XL will not work.')

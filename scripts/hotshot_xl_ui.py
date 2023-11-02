@@ -2,7 +2,6 @@ import os
 import cv2
 import gradio as gr
 
-import packages
 
 class ToolButton(gr.Button, gr.components.FormComponent):
     """Small button with single emoji as text, fits inside gradio forms"""
@@ -118,12 +117,6 @@ class HotshotXLUiGroup:
         with gr.Accordion("Hotshot-XL", open=False):
 
             further_setup_needed = False
-
-            if not packages.is_diffusers_installed():
-                further_setup_needed = True
-                with gr.Row():
-                    gr.Markdown(f"""This package relies on diffusers=={packages.min_diffusers_version}. Please make sure it is installed!
-                    pip install diffusers=={packages.min_diffusers_version}""")
 
             if len(model_list) == 0:
                 further_setup_needed = True
